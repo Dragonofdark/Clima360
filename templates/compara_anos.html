@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Clima 360° - Comparar Anos</title>
+  <link rel="stylesheet" type="text/css" href="{% static '/style.css' %}">
+</head>
+<body>
+  <h1>Clima 360°</h1>
+  <h2>Escolha os anos que deseja comparar:</h2>
+
+  {% if erro %}
+      <p style="color: red;">{{ erro }}</p>
+  {% endif %}
+
+  <form method="POST" action="{% url 'anos' %}">
+      {% csrf_token %}
+      <div class="container">
+        <div class="dropdown">
+          <label for="ano1">Ano 1:</label>
+          <select id="ano1" name="ano1">
+            <option value="">--- Selecione o Ano 1 ---</option>
+            {% for valor_ano, nome_ano in anos %}
+              <option value="{{ valor_ano }}" {% if request.session.ano1_escolhido == valor_ano|stringformat:"s" %}selected{% endif %}>{{ nome_ano }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="dropdown">
+          <label for="ano2">Ano 2:</label>
+          <select id="ano2" name="ano2">
+            <option value="">--- Selecione o Ano 2 ---</option>
+            {% for valor_ano, nome_ano in anos %}
+              <option value="{{ valor_ano }}" {% if request.session.ano2_escolhido == valor_ano|stringformat:"s" %}selected{% endif %}>{{ nome_ano }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="center-button">
+          <button type="submit">Ver Resultados</button>
+      </div>
+  </form>
+
+  <div class="resultado" id="resultado_js_local"></div>
+  <script>
+    const ano1Select = document.getElementById('ano1');
+    const ano2Select = document.getElementById('ano2');
+    const resultadoJsLocal = document.getElementById('resultado_js_local');
+
+    function compararAnosLocalmente() {
+      const valor1 = ano1Select.value;
+      const valor2 = ano2Select.value;
+
+      if (valor1 && valor2) {
+        if (valor1 === valor2) {
+          resultadoJsLocal.textContent = `Aviso: Os anos selecionados são iguais: ${valor1}. Você deve selecionar anos diferentes para comparação.`;
+        } else {
+          resultadoJsLocal.textContent = `Pré-visualização: Comparando ${valor1} vs ${valor2}`;
+        }
+      } else {
+        resultadoJsLocal.textContent = '';
+      }
+    }
+
+    if (ano1Select && ano2Select) {
+        ano1Select.addEventListener('change', compararAnosLocalmente);
+        ano2Select.addEventListener('change', compararAnosLocalmente);
+    }
+  </script>
+</body>
+</html>

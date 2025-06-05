@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: Clima360
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn setup.wsgi:application
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: setup

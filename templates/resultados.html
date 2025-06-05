@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Clima 360° - Resultados da Comparação</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"> {# Removido / inicial se 'style.css' está na raiz de static/ #}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="resultados-container"> {# NOVO WRAPPER #}
+    <h1>Resultados da Comparação Climática</h1>
+
+    {% if mensagem_erro %}
+        <p style="color: red; text-align: center; background-color: #ffdddd; padding: 10px; border-radius: 5px;">{{ mensagem_erro }}</p>
+    {% endif %}
+
+    {% if not comparacao_salva %}
+        <form method="POST" action="{% url 'resultados' %}" class="form-resultados"> {# Adicionada classe para possível estilização futura #}
+            {% csrf_token %}
+            <h4 style="text-align:center; margin-bottom:20px;">Preencha os Campos para Comparação</h4>
+            <div class="form-group">
+                <label for="{{ form.medida.id_for_label }}">Tipo de Medida:</label>
+                {{ form.medida }}
+                {% if form.medida.errors %}<div class="errorlist">{{ form.medida.errors }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.cidade.id_for_label }}">Cidade:</label>
+                {{ form.cidade }}
+                {% if form.cidade.errors %}<div class="errorlist">{{ form.cidade.errors }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.mes.id_for_label }}">Mês de Referência:</label>
+                {{ form.mes }}
+                {% if form.mes.errors %}<div class="errorlist">{{ form.mes.errors }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.ano1.id_for_label }}">Primeiro Ano:</label>
+                {{ form.ano1 }}
+                {% if form.ano1.errors %}<div class="errorlist">{{ form.ano1.errors }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.ano2.id_for_label }}">Segundo Ano:</label>
+                {{ form.ano2 }}
+                {% if form.ano2.errors %}<div class="errorlist">{{ form.ano2.errors }}</div>{% endif %}
+            </div>
+            
+            {% if form.non_field_errors %}
+                <div class="errorlist" style="text-align:center; margin-bottom:10px;">{{ form.non_field_errors }}</div>
+            {% endif %}
+            
+            <div class="center-button"> {# Usar center-button para o botão do formulário também #}
+                 <button type="submit">Comparar</button>
+            </div>
+        </form>
+    {% endif %}
+
+    {% if comparacao_salva %}
+        <div class="parametros-card"> {# Usando a nova classe CSS #}
+            <h4>Parâmetros Selecionados</h4>
+            <p><strong>Medida:</strong> {{ medida_selecionada|default:"N/A" }}</p>
+            <p><strong>Cidade:</strong> {{ cidade|default:"N/A" }}</p>
+            <p><strong>Mês de Referência:</strong> {{ mes_nome|default:"N/A" }} (Mês {{ mes_numero|default:"N/A" }})</p>
+            <p><strong>Comparando Anos:</strong> {{ ano1|default:"N/A" }} <strong>vs</strong> {{ ano2|default:"N/A" }}</p>
+        </div>
+
+        <div class="graficos-grid"> {# Usando a nova classe CSS #}
+            <div class="grafico-container"> {# Usando a nova classe CSS #}
+                <h5>Gráfico Comparativo Diário para {{ mes_nome }}</h5>
+                <div id="grafico-comparacao-diaria"> 
+                    <canvas id="graficoDiario"></canvas> {# Removido width e height, Chart.js lida com isso responsivamente #}
+                </div>
+            </div>
+            <div class="grafico-container"> {# Usando a nova classe CSS #}
+                <h5>Gráfico Comparativo de Dispersão (Métricas do Mês)</h5>
+                <div id="grafico-comparacao-dispersao">
+                    <canvas id="graficoDispersao"></canvas> {# Removido width e height #}
+                </div>
+            </div>
+        </div>
+
+        {# SCRIPT DOS GRÁFICOS (permanece o mesmo) #}
+        <script>
+            // Gráfico de Dados Diários
+            const ctxDiario = document.getElementById('graficoDiario')?.getContext('2d');
+            if (ctxDiario) {
+                const dadosDiariosAno1 = {{ dados_diarios_ano1_json|safe|default:'[]' }};
+                const dadosDiariosAno2 = {{ dados_diarios_ano2_json|safe|default:'[]' }};
+                const labelsDias = {{ labels_dias_mes_json|safe|default:"[]" }};
+
+                new Chart(ctxDiario, {
+                    type: 'line',
+                    data: {
+                        labels: labelsDias,
+                        datasets: [
+                            {
+                                label: '{{ ano1|escapejs }} ({{medida_selecionada|escapejs}})',
+                                data: dadosDiariosAno1,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Adicionado para área sob a linha
+                                fill: true, // Habilitar preenchimento
+                                tension: 0.1
+                            },
+                            {
+                                label: '{{ ano2|escapejs }} ({{medida_selecionada|escapejs}})',
+                                data: dadosDiariosAno2,
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Adicionado para área sob a linha
+                                fill: true, // Habilitar preenchimento
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // Para controlar melhor a altura
+                        plugins: {
+                            title: { display: true, text: 'Comparação Diária de {{ medida_selecionada|escapejs }} para {{ mes_nome|escapejs }}' },
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: 'Dia do Mês'}},
+                            y: { title: { display: true, text: '{{ medida_selecionada|escapejs }}'}}
+                        }
+                    }
+                });
+            }
+
+            // Gráfico de Dispersão (Métricas Calculadas para o Mês)
+            const ctxDispersao = document.getElementById('graficoDispersao')?.getContext('2d');
+            if (ctxDispersao && typeof {{ dispersao|safe }} === 'object' && {{ dispersao|safe }} !== null) {
+                const dispersaoData = {{ dispersao|safe }};
+                console.log("Dados para gráfico de dispersão:", dispersaoData);
+
+                new Chart(ctxDispersao, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Média', 'Desvio Padrão', 'Variância'],
+                        datasets: [
+                            {
+                                label: '{{ ano1|escapejs }}',
+                                data: [
+                                    dispersaoData.ano1_metricas?.media,
+                                    dispersaoData.ano1_metricas?.desvioPadrao,
+                                    dispersaoData.ano1_metricas?.variancia
+                                ],
+                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: '{{ ano2|escapejs }}',
+                                data: [
+                                    dispersaoData.ano2_metricas?.media,
+                                    dispersaoData.ano2_metricas?.desvioPadrao,
+                                    dispersaoData.ano2_metricas?.variancia
+                                ],
+                                backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: { display: true, text: 'Comparação das Métricas de Dispersão do Mês' },
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                             y: { beginAtZero: true }
+                        }
+                    }
+                });
+            } else {
+                console.log("Dados de dispersão não disponíveis ou inválidos para o gráfico.");
+            }
+        </script>
+
+        <div class="tabela-metricas-container"> {# Usando a nova classe CSS #}
+            <h5>Métricas Calculadas para {{ mes_nome }}</h5>
+            <table class="table-metricas"> {# Usando a nova classe CSS #}
+            <thead>
+                <tr>
+                    <th>Métrica</th>
+                    <th>{{ ano1 }}</th>
+                    <th>{{ ano2 }}</th>
+                    <th>Diferença ({{ano2}} - {{ano1}})</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Média</td>
+                    <td>{{ dispersao.ano1_metricas.media|floatformat:2|default_if_none:"N/A" }}</td>
+                    <td>{{ dispersao.ano2_metricas.media|floatformat:2|default_if_none:"N/A" }}</td>
+                    <td>{{ dispersao.diferencas.media|floatformat:2|default_if_none:"N/A" }}</td>
+                </tr>
+                <tr>
+                    <td>Desvio Padrão</td>
+                    <td>{{ dispersao.ano1_metricas.desvioPadrao|floatformat:2|default_if_none:"N/A" }}</td>
+                    <td>{{ dispersao.ano2_metricas.desvioPadrao|floatformat:2|default_if_none:"N/A" }}</td>
+                    <td>{{ dispersao.diferencas.desvioPadrao|floatformat:2|default_if_none:"N/A" }}</td>
+                </tr>
+                <tr>
+                    <td>Variância</td>
+                    <td>{{ dispersao.ano1_metricas.variancia|floatformat:2|default_if_none:"N/A" }}</td>
+                    <td>{{ dispersao.ano2_metricas.variancia|floatformat:2|default_if_none:"N/A" }}</td>
+                    <td>{{ dispersao.diferencas.variancia|floatformat:2|default_if_none:"N/A" }}</td>
+                </tr>
+                 <tr>
+                    <td>Contagem de Dias Válidos</td>
+                    <td>{{ dispersao.ano1_metricas.count|default_if_none:"N/A" }}</td>
+                    <td>{{ dispersao.ano2_metricas.count|default_if_none:"N/A" }}</td>
+                    <td style="text-align:center;">-</td> {# Centralizado e sem valor #}
+                </tr>
+            </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <div class="navegacao-final"> {# Usando a nova classe CSS #}
+        <a href="{% url 'inicio' %}" class="btn">Voltar ao Início</a>
+        {% if comparacao_salva %}
+            <a href="{% url 'resultados' %}" class="btn">Nova Comparação</a>
+        {% else %}
+             <a href="{% url 'medida' %}" class="btn">Reiniciar Seleção</a>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Clima 360°</title>
+    <link rel="stylesheet" type="text/css" href="{% static '/style.css' %}">
+</head>
+<body>
+    <h1>Clima 360°</h1>
+    <h3>Analise o clima de uma região com base em medidas de dispersão</h3>
+    
+    <a href="{% url 'medida' %}">
+        <button type="button">Analisar</button>
+    </a>
+</body>
+</html>
+

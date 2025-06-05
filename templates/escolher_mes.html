@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Clima 360° - Escolher Mês</title>
+  <link rel="stylesheet" type="text/css" href="{% static '/style.css' %}">
+</head>
+<body>
+  <h1>Clima 360°</h1>
+  <h2>Escolha o mês de referência para a análise:</h2>
+
+  {% if erro %}
+      <p style="color: red;">{{ erro }}</p>
+  {% endif %}
+
+  <form method="POST" action="{% url 'mes' %}">
+      {% csrf_token %}
+      <div class="container">
+        <div class="dropdown">
+          <label for="mes">Mês:</label>
+          <select id="mes" name="mes">
+            <option value="">--- Selecione um mês ---</option>
+            {% for valor_mes, nome_mes in meses %}
+              <option value="{{ valor_mes }}" {% if request.session.mes_escolhido == valor_mes %}selected{% endif %}>{{ nome_mes }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="center-button">
+        <button type="submit">Próximo</button>
+      </div>
+  </form>
+</body>
+</html>
