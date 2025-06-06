@@ -8,26 +8,28 @@
 </head>
 <body>
   <h1>Clima 360°</h1>
-  <h2>Escolha a cidade que deseja analisar:</h2>
+  <div class="form-container-etapa">
+    <h2>Escolha a cidade que deseja analisar:</h2>
 
-  {% if erro %}
-      <p style="color: red;">{{ erro }}</p>
-  {% endif %}
+    {% if erro %}
+        <p style="color: red;">{{ erro }}</p>
+    {% endif %}
 
-  <form method="POST" action="{% url 'cidades' %}">
-      {% csrf_token %}
-      <div class="dropdown">
-        <label for="cidade">Escolha a cidade:</label>
-        <select id="cidade" name="cidade">
-          <option value="">--- Selecione uma cidade ---</option>
-          {% for nome_cidade, coordenadas in cidades %}
-            <option value="{{ nome_cidade }}" {% if request.session.cidade_escolhida == nome_cidade %}selected{% endif %}>{{ nome_cidade }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="center-button">
-        <button type="submit">Próximo</button>
-      </div>
-  </form>
+    <form method="POST" action="{% url 'cidades' %}">
+        {% csrf_token %}
+        <div class="dropdown">
+          <label for="cidade">Escolha a cidade:</label>
+          <select id="cidade" name="cidade">
+            <option value="">--- Selecione uma cidade ---</option>
+            {% for nome_cidade, coordenadas in cidades %}
+              <option value="{{ nome_cidade }}" {% if request.session.cidade_escolhida == nome_cidade %}selected{% endif %}>{{ nome_cidade }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="center-button">
+          <button type="submit">Próximo</button>
+        </div>
+    </form>
+  </div>
 </body>
 </html>

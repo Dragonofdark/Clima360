@@ -8,26 +8,29 @@
 </head>
 <body>
     <h1>Clima 360°</h1>
-    <h3>Escolha qual medida será analisada:</h3>
 
-    {% if erro %}
-        <p style="color: red;">{{ erro }}</p>
-    {% endif %}
+    <div class="form-container-etapa">
+        <h3>Escolha qual medida será analisada:</h3>
 
-    <form method="POST" action="{% url 'medida' %}">
-        {% csrf_token %}
-        <ul>
-            {% for value, display_text in tipos_medidas %}
-            <li>
-                <input type="radio" name="medida" id="medida_{{ value }}" value="{{ value }}" {% if request.session.medida_escolhida == value %}checked{% endif %}>
-                <label for="medida_{{ value }}">{{ display_text }}</label>
-            </li>
-            {% empty %}
-            <li>Nenhuma medida disponível.</li>
-            {% endfor %}
-        </ul>
+        {% if erro %}
+            <p style="color: red;">{{ erro }}</p>
+        {% endif %}
 
-        <button type="submit">Próximo</button>
-    </form>
+        <form method="POST" action="{% url 'medida' %}">
+            {% csrf_token %}
+            <ul>
+                {% for value, display_text in tipos_medidas %}
+                <li>
+                    <input type="radio" name="medida" id="medida_{{ value }}" value="{{ value }}" {% if request.session.medida_escolhida == value %}checked{% endif %}>
+                    <label for="medida_{{ value }}">{{ display_text }}</label>
+                </li>
+                {% empty %}
+                <li>Nenhuma medida disponível.</li>
+                {% endfor %}
+            </ul>
+
+            <button type="submit">Próximo</button>
+        </form>
+    </div>
 </body>
 </html>

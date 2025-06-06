@@ -4,6 +4,7 @@ body {
   margin: 0;
   background: linear-gradient(to right, #74ebd5, #ACB6E5);
   color: #333;
+  text-align: center;
 }
 
 h1, h2, h3, h4, h5, h6 { /* Aplicar a todos os cabeçalhos */
@@ -54,7 +55,7 @@ a:hover {
 }
 
 /* NOVO: Estilos para a página de resultados */
-.resultados-container { /* Um wrapper para toda a seção de resultados */
+.resultados-container, .form-container-etapa { /* Um wrapper para toda a seção de resultados */
     background-color: rgba(255, 255, 255, 0.9); /* Fundo branco semi-transparente */
     padding: 30px;
     border-radius: 10px;
@@ -63,6 +64,7 @@ a:hover {
     max-width: 1000px; /* Limitar a largura para melhor leitura em telas grandes */
     margin-left: auto;
     margin-right: auto;
+    text-align: left;
 }
 
 .parametros-card {
@@ -205,4 +207,64 @@ a:hover {
     font-size: 0.9em;
     list-style-type: none;
     padding-left: 0;
+}
+
+.form-container-etapa {
+    background-color: rgba(255, 255, 255, 0.85); /* Fundo um pouco mais opaco que o de resultados */
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    max-width: 500px; /* Largura máxima para os formulários das etapas */
+    margin: 30px auto; /* Centraliza o bloco na página e adiciona margem superior/inferior */
+    text-align: center
+}
+
+.form-container-etapa ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 25px;
+    text-align: left; /* Alinhar o texto dos labels à esquerda, dentro do item da lista */
+    max-width: 250px; /* Limitar largura da lista para melhor aparência */
+    margin-left: auto; /* Centralizar a lista de radios em si */
+    margin-right: auto;
+}
+
+.form-container-etapa ul li {
+    padding: 8px 0;
+    font-size: 17px; /* Aumentar um pouco */
+}
+.form-container-etapa ul li input[type="radio"] {
+    margin-right: 10px;
+    vertical-align: middle; /* Alinhar rádio com o texto */
+}
+.form-container-etapa ul li label {
+    vertical-align: middle;
+}
+
+
+/* Ajustes para o dropdown em cidade.html */
+.form-container-etapa .dropdown {
+    margin-bottom: 25px;
+    /* display: flex; e flex-direction: column; já estão no seu .dropdown */
+    /* align-items: center; já está no seu .dropdown */
+}
+
+.form-container-etapa .dropdown label {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333; /* Cor consistente com outros labels */
+}
+
+.form-container-etapa .dropdown select {
+    padding: 12px; /* Aumentar padding */
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc; /* Adicionar uma borda sutil */
+    min-width: 250px; /* Largura mínima para o select */
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Isso centraliza os itens DENTRO do dropdown, o que é bom para label e select */
 }
