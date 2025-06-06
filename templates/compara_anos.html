@@ -8,42 +8,44 @@
 </head>
 <body>
   <h1>Clima 360°</h1>
-  <h2>Escolha os anos que deseja comparar:</h2>
+  <div class="form-container-etapa">
+    <h2>Escolha os anos que deseja comparar:</h2>
 
-  {% if erro %}
-      <p style="color: red;">{{ erro }}</p>
-  {% endif %}
+    {% if erro %}
+        <p style="color: red;">{{ erro }}</p>
+    {% endif %}
 
-  <form method="POST" action="{% url 'anos' %}">
-      {% csrf_token %}
-      <div class="container">
-        <div class="dropdown">
-          <label for="ano1">Ano 1:</label>
-          <select id="ano1" name="ano1">
-            <option value="">--- Selecione o Ano 1 ---</option>
-            {% for valor_ano, nome_ano in anos %}
-              <option value="{{ valor_ano }}" {% if request.session.ano1_escolhido == valor_ano|stringformat:"s" %}selected{% endif %}>{{ nome_ano }}</option>
-            {% endfor %}
-          </select>
+    <form method="POST" action="{% url 'anos' %}">
+        {% csrf_token %}
+        <div class="container">
+          <div class="dropdown">
+            <label for="ano1">Ano 1:</label>
+            <select id="ano1" name="ano1">
+              <option value="">--- Selecione o Ano 1 ---</option>
+              {% for valor_ano, nome_ano in anos %}
+                <option value="{{ valor_ano }}" {% if request.session.ano1_escolhido == valor_ano|stringformat:"s" %}selected{% endif %}>{{ nome_ano }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
-      </div>
 
-      <div class="container">
-        <div class="dropdown">
-          <label for="ano2">Ano 2:</label>
-          <select id="ano2" name="ano2">
-            <option value="">--- Selecione o Ano 2 ---</option>
-            {% for valor_ano, nome_ano in anos %}
-              <option value="{{ valor_ano }}" {% if request.session.ano2_escolhido == valor_ano|stringformat:"s" %}selected{% endif %}>{{ nome_ano }}</option>
-            {% endfor %}
-          </select>
+        <div class="container">
+          <div class="dropdown">
+            <label for="ano2">Ano 2:</label>
+            <select id="ano2" name="ano2">
+              <option value="">--- Selecione o Ano 2 ---</option>
+              {% for valor_ano, nome_ano in anos %}
+                <option value="{{ valor_ano }}" {% if request.session.ano2_escolhido == valor_ano|stringformat:"s" %}selected{% endif %}>{{ nome_ano }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
-      </div>
 
-      <div class="center-button">
-          <button type="submit">Ver Resultados</button>
-      </div>
-  </form>
+        <div class="center-button">
+            <button type="submit">Ver Resultados</button>
+        </div>
+    </form>
+  </div>
 
   <div class="resultado" id="resultado_js_local"></div>
   <script>
